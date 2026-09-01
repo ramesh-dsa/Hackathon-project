@@ -4,6 +4,7 @@ import { Card, CardContent } from "../../components/ui/card";
 import { Avatar } from "../../components/ui/avatar";
 import { Rating } from "../../components/ui/rating";
 import { Badge } from "../../components/ui/badge";
+import CurvedLoop from "../../components/ui/curved-loop";
 
 export default function LandingPage() {
   return (
@@ -19,7 +20,7 @@ export default function LandingPage() {
             Join a community of learners and teachers. Offer what you know, and learn what you want. The only currency is knowledge.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
-            <Button as={Link} href="/dashboard" size="large" variant="primary" className="w-full sm:w-auto">
+            <Button as={Link} href="/register" size="large" variant="primary" className="w-full sm:w-auto">
               Get Started
             </Button>
             <Button as={Link} href="/discover" size="large" variant="outline" className="w-full sm:w-auto">
@@ -27,6 +28,28 @@ export default function LandingPage() {
             </Button>
           </div>
         </div>
+      </section>
+
+      {/* Brand Curved Loop Transition */}
+      <section
+        aria-label="Skill Exchange values"
+        className="relative border-y border-border/60 bg-surface/30"
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-copper-500/40 to-transparent"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-copper-500/40 to-transparent"
+        />
+        <CurvedLoop
+          marqueeText="SHARE • LEARN • EXCHANGE • CONNECT • TRUST • "
+          speed={1.5}
+          curveAmount={400}
+          direction="left"
+          interactive={true}
+        />
       </section>
 
       {/* How It Works Section */}

@@ -30,10 +30,10 @@ export function Navbar() {
             </nav>
           </div>
           <div className="flex items-center space-x-4">
-            <Link href="/dashboard" className="hidden md:inline-flex text-sm font-medium text-foreground-secondary hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-sm">
+            <Link href="/login" className="hidden md:inline-flex text-sm font-medium text-foreground-secondary hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-sm">
               Sign In
             </Link>
-            <Button as={Link} href="/dashboard" variant="primary" className="hidden sm:inline-flex">
+            <Button as={Link} href="/register" variant="primary" className="hidden sm:inline-flex">
               Get Started
             </Button>
             
@@ -77,10 +77,10 @@ export function Navbar() {
             About
           </Link>
           <div className="pt-4 flex flex-col gap-3">
-            <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="px-2 py-2 text-base font-medium text-foreground-secondary hover:text-foreground transition-colors">
+            <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="px-2 py-2 text-base font-medium text-foreground-secondary hover:text-foreground transition-colors">
               Sign In
             </Link>
-            <Button as={Link} href="/dashboard" variant="primary" onClick={() => setIsMobileMenuOpen(false)} className="w-full">
+            <Button as={Link} href="/register" variant="primary" onClick={() => setIsMobileMenuOpen(false)} className="w-full">
               Get Started
             </Button>
           </div>
