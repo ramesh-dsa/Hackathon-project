@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "skills": {
+    "check-fix-accessibility": {
+      "source": "neha/check-fix-accessibility",
+      "sourceType": "github",
+      "skillPath": "check-fix-accessibility/SKILL.md",
+      "computedHash": "d08fc09c28f5956d710af053f49d3ae90a3794399fc941802c5593cbe22692de"
+    },
+    "frontend-ui": {
+      "source": "scientiacapital/skills",
+      "sourceType": "github",
+      "skillPath": "active/frontend-ui-skill/SKILL.md",
+      "computedHash": "59ea0e52b4a9088ec73b1e84b98f7b07508742bc71e56b7e4057921b8a04dd34"
+    },
+    "react": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "react/SKILL.md",
+      "computedHash": "463b2de9fe87acf9bc3cb692a91d8628ee1502aee2c77745d2dd1f6bfe206779"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/ui-ux-pro-max/SKILL.md",
+      "computedHash": "523b8063c07eedd2b8a1ca94d7a0be9ad340026bd9f21a1eda0b6be2a855298f"
+    },
+    "webapp-testing": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "skillPath": "skills/webapp-testing/SKILL.md",
+      "computedHash": "e386cf78f5a002c8fa684066f933c670571f3cfb43b0d66bfc82050d74d6ea64"
+    }
+  }
+}
