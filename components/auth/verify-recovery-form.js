@@ -21,6 +21,12 @@ export function VerifyRecoveryForm() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
+
+  // 60-second resend cooldown timer
+  const [countdown, setCountdown] = useState(60);
+  const [canResend, setCanResend] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+
   const router = useRouter();
   const supabase = createClient();
 
@@ -30,6 +36,18 @@ export function VerifyRecoveryForm() {
       setEmail(emailParam);
     }
   }, [searchParams]);
+
+  // Handle 60s countdown timer
+  useEffect(() => {
+    if (countdown <= 0) {
+      setCanResend(true);
+      return;
+    }
+    const timer = setInterval(() => {
+      setCountdown((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [countdown]);
 
   const handleVerify = async (e) => {
     if (e) e.preventDefault();
@@ -72,6 +90,32 @@ export function VerifyRecoveryForm() {
       router.push('/reset-password');
       router.refresh();
     }, 800);
+  };
+
+  const handleResend = async () => {
+    if (!canResend || isResending || !email) return;
+
+    setIsResending(true);
+    setError('');
+    setSuccess('');
+
+    const { error: resendError } = await supabase.auth.resetPasswordForEmail(email);
+
+    setIsResending(false);
+
+    if (resendError) {
+      const msg = resendError.message.toLowerCase();
+      if (msg.includes('rate limit') || resendError.status === 429) {
+        setError('Please wait before requesting another recovery code.');
+      } else {
+        setError('Failed to resend recovery code. Please try again.');
+      }
+      return;
+    }
+
+    setSuccess('New 6-digit recovery code sent to your email.');
+    setCanResend(false);
+    setCountdown(60);
   };
 
   useEffect(() => {
@@ -134,13 +178,33 @@ export function VerifyRecoveryForm() {
         </Button>
       </form>
 
-      <div className="text-center pt-2">
-        <Link
-          href="/forgot-password"
-          className="text-sm font-medium text-primary hover:text-primary-hover transition-colors"
-        >
-          ← Back to Forgot Password
-        </Link>
+      <div className="text-center space-y-3 pt-2">
+        <p className="text-sm text-foreground-secondary">
+          Didn&apos;t receive the code?{' '}
+          {canResend ? (
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={isResending}
+              className="font-medium text-primary hover:text-primary-hover focus:outline-none focus:ring-2 focus:ring-focus rounded-sm transition-colors"
+            >
+              {isResending ? 'Sending...' : 'Resend code'}
+            </button>
+          ) : (
+            <span className="font-medium text-foreground-muted cursor-not-allowed">
+              Resend code in {countdown}s
+            </span>
+          )}
+        </p>
+
+        <p className="text-xs text-foreground-muted">
+          <Link
+            href="/forgot-password"
+            className="font-medium text-primary hover:text-primary-hover transition-colors"
+          >
+            ← Back to Forgot Password
+          </Link>
+        </p>
       </div>
     </div>
   );
