@@ -77,26 +77,49 @@ export function RegisterForm() {
     setIsLoading(false);
 
     if (error) {
-      // Rate limit — too many signup attempts for this email
+      const msg = error.message ? error.message.toLowerCase() : '';
+      const code = error.code ? error.code.toLowerCase() : '';
+
+      // 1. Rate Limit Exceeded (Supabase built-in SMTP rate limit)
       if (
-        error.message.toLowerCase().includes('rate limit') ||
-        error.message.toLowerCase().includes('email rate limit') ||
+        msg.includes('rate limit') ||
+        msg.includes('too many') ||
+        code === 'over_email_send_rate_limit' ||
         error.status === 429
       ) {
-        setErrors({ form: 'Too many attempts. Please wait a few minutes before trying again, or check your inbox for a previous confirmation email.' });
+        setErrors({
+          form: 'Too many signup attempts. Please wait a few minutes before trying again, or configure Custom SMTP in Supabase.'
+        });
         return;
       }
-      // Email already registered
+
+      // 2. User/Email Already Exists
       if (
-        error.message.toLowerCase().includes('already registered') ||
-        error.message.toLowerCase().includes('user already exists') ||
-        error.message.toLowerCase().includes('email already')
+        msg.includes('already registered') ||
+        msg.includes('user already exists') ||
+        msg.includes('email already') ||
+        code === 'user_already_exists'
       ) {
-        setErrors({ form: 'An account with this email already exists. Try signing in instead.' });
+        setErrors({
+          form: 'An account with this email already exists. Please sign in instead.'
+        });
         return;
       }
-      // All other errors — surface as-is
-      setErrors({ form: error.message });
+
+      // 3. Email Provider Disabled / Unauthorized Address
+      if (
+        msg.includes('not authorized') ||
+        msg.includes('disabled') ||
+        code === 'email_provider_disabled'
+      ) {
+        setErrors({
+          form: 'Email delivery is restricted for this address. Please configure Custom SMTP (e.g., Brevo) in Supabase.'
+        });
+        return;
+      }
+
+      // 4. Fallback Error Message
+      setErrors({ form: error.message || 'Unable to create your account right now. Please try again later.' });
       return;
     }
 
