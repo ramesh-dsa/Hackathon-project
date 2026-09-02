@@ -10,9 +10,10 @@ import { Button } from "../../../../components/ui/button";
 export default function ChatRoom() {
   const params = useParams();
   const router = useRouter();
-  const exchangeId = params.id;
+  const conversationId = params.id;
   
-  const { currentUser, exchanges } = useUser();
+  const { currentUser } = useUser();
+  const [partner, setPartner] = useState(null);
   const [messages, setMessages] = useState([]);
   const [pendingMessages, setPendingMessages] = useState([]);
   const [inputText, setInputText] = useState("");
@@ -22,33 +23,49 @@ export default function ChatRoom() {
   const messagesEndRef = useRef(null);
   const supabase = createClient();
   
-  // Verify authorization contextually. 
-  // RLS is the true security boundary, but this prevents unnecessary queries.
-  const exchange = exchanges.find(e => e.id === exchangeId);
-  const isAuthorized = !!exchange && (exchange.status === 'in-progress' || exchange.status === 'completed');
-
   useEffect(() => {
-    // Wait until exchanges are loaded. If not loaded, we can't verify yet.
-    if (!currentUser || exchanges.length === 0) return;
-
-    if (!isAuthorized) {
-      setError("Unauthorized or Conversation Not Found");
-      setLoading(false);
-      return;
-    }
+    if (!currentUser) return;
 
     let isMounted = true;
     let channel;
 
     const initializeChat = async () => {
+      // 0. Verify authorization and get partner details
+      const { data: convData, error: convError } = await supabase
+        .from('conversations')
+        .select(`
+          id,
+          user1_id,
+          user2_id,
+          user1:users!user1_id(id, name, avatar),
+          user2:users!user2_id(id, name, avatar)
+        `)
+        .eq('id', conversationId)
+        .maybeSingle();
+
+      if (convError || !convData) {
+        if (isMounted) {
+          setError("Unauthorized or Conversation Not Found");
+          setLoading(false);
+        }
+        return;
+      }
+      
+      const isUser1 = convData.user1_id === currentUser.id;
+      const thePartner = isUser1 ? convData.user2 : convData.user1;
+      
+      if (isMounted) {
+        setPartner(thePartner);
+      }
+
       // 1. Establish Realtime Subscription
-      channel = supabase.channel(`messages:${exchangeId}`);
+      channel = supabase.channel(`messages:${conversationId}`);
       
       channel.on('postgres_changes', { 
         event: 'INSERT', 
         schema: 'public', 
         table: 'messages', 
-        filter: `exchange_id=eq.${exchangeId}` 
+        filter: `conversation_id=eq.${conversationId}` 
       }, (payload) => {
         if (!isMounted) return;
         const newMsg = payload.new;
@@ -75,19 +92,19 @@ export default function ChatRoom() {
       if (!isMounted) return;
 
       // 3. Fetch latest messages (History)
-      const { data, error } = await supabase
+      const { data: msgData, error: msgError } = await supabase
         .from('messages')
         .select('*')
-        .eq('exchange_id', exchangeId)
+        .eq('conversation_id', conversationId)
         .order('created_at', { ascending: false })
         .limit(50);
         
-      if (error) {
-        console.error("Failed to fetch messages:", error);
+      if (msgError) {
+        console.error("Failed to fetch messages:", msgError);
         setError("Failed to load history.");
-      } else if (data) {
+      } else if (msgData) {
         // Reverse to get chronological order
-        const chronologicalData = data.reverse();
+        const chronologicalData = msgData.reverse();
         
         // 4. Deduplicate/Reconcile by canonical database message.id
         setMessages(prev => {
@@ -109,7 +126,7 @@ export default function ChatRoom() {
         supabase.removeChannel(channel);
       }
     };
-  }, [currentUser, isAuthorized, exchangeId, exchanges.length]);
+  }, [currentUser, conversationId]);
 
   // Auto-scroll on new message
   useEffect(() => {
@@ -128,7 +145,7 @@ export default function ChatRoom() {
     const optimisticMsg = {
       id: tempId,
       sender_id: currentUser.id,
-      exchange_id: exchangeId,
+      conversation_id: conversationId,
       content,
       created_at: new Date().toISOString(),
       is_read: false
@@ -139,7 +156,7 @@ export default function ChatRoom() {
     const { data, error } = await supabase
       .from('messages')
       .insert([{
-        exchange_id: exchangeId,
+        conversation_id: conversationId,
         sender_id: currentUser.id,
         content
       }])
@@ -190,10 +207,10 @@ export default function ChatRoom() {
           <Button variant="ghost" className="p-2 md:hidden" onClick={() => router.push('/messages')}>
             &larr; Back
           </Button>
-          <Avatar src={exchange.partner.avatar} alt={exchange.partner.name} size="sm" />
+          <Avatar src={partner?.avatar} alt={partner?.name} size="sm" />
           <div>
-            <h2 className="font-semibold text-foreground">{exchange.partner.name}</h2>
-            <p className="text-xs text-foreground-secondary">{exchange.partner.offering}</p>
+            <h2 className="font-semibold text-foreground">{partner?.name}</h2>
+            <p className="text-xs text-foreground-secondary">Direct Message</p>
           </div>
         </div>
       </div>

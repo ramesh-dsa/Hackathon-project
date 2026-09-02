@@ -12,7 +12,8 @@ export function MatchCard({ match }) {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRequested, setIsRequested] = useState(false);
-  const { currentUser, sendRequest, requests } = useUser();
+  const [isMessaging, setIsMessaging] = useState(false);
+  const { currentUser, sendRequest, requests, getOrCreateConversation } = useUser();
 
   // Check if we already requested this user
   const sentRequest = requests?.sent?.find(r => r.user.id === match.id);
@@ -31,6 +32,18 @@ export function MatchCard({ match }) {
     setTimeout(() => {
       setIsModalOpen(false);
     }, 1500);
+  };
+
+  const handleMessage = async (e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    setIsMessaging(true);
+    const convId = await getOrCreateConversation(match.id);
+    if (convId) {
+      router.push(`/messages/${convId}`);
+    } else {
+      setIsMessaging(false);
+    }
   };
 
   return (
@@ -72,6 +85,14 @@ export function MatchCard({ match }) {
                     className="transition-transform duration-200"
                   >
                     View Profile
+                  </Button>
+                  <Button 
+                    onClick={handleMessage}
+                    disabled={isMessaging}
+                    variant="secondary" 
+                    size="small"
+                  >
+                    {isMessaging ? '...' : 'Message'}
                   </Button>
                   {!showAsRequested && (
                     <Button 
@@ -148,6 +169,9 @@ export function MatchCard({ match }) {
             <div className="mt-8 flex gap-3 w-full">
               <Button onClick={() => setIsModalOpen(false)} variant="secondary" className="flex-1">
                 Close
+              </Button>
+              <Button onClick={handleMessage} disabled={isMessaging} variant="secondary" className="flex-1">
+                {isMessaging ? '...' : 'Message'}
               </Button>
               <Button 
                 onClick={() => {
