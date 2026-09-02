@@ -5,6 +5,7 @@ import { Avatar } from "../../components/ui/avatar";
 import { Rating } from "../../components/ui/rating";
 import { Badge } from "../../components/ui/badge";
 import CurvedLoop from "../../components/ui/curved-loop";
+import BlurText from "../../components/ui/blur-text";
 
 export default function LandingPage() {
   return (
@@ -14,7 +15,8 @@ export default function LandingPage() {
         <div className="max-w-4xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
           <Badge variant="brand" className="mb-6 px-4 py-1.5 text-sm">Welcome to Skill Exchange</Badge>
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-foreground">
-            Exchange skills, <span className="text-primary">not money.</span>
+            <BlurText text="Exchange skills," delay={150} animateBy="words" direction="top" className="inline-block" />
+            {' '}<span className="text-primary">not money.</span>
           </h1>
           <p className="text-xl text-foreground-secondary max-w-2xl mx-auto leading-relaxed">
             Join a community of learners and teachers. Offer what you know, and learn what you want. The only currency is knowledge.
@@ -23,37 +25,13 @@ export default function LandingPage() {
             <Button as={Link} href="/register" size="large" variant="primary" className="w-full sm:w-auto">
               Get Started
             </Button>
-            <Button as={Link} href="/discover" size="large" variant="outline" className="w-full sm:w-auto">
-              Explore Skills
-            </Button>
+
           </div>
         </div>
       </section>
 
-      {/* Brand Curved Loop Transition */}
-      <section
-        aria-label="Skill Exchange values"
-        className="relative border-y border-border/60 bg-surface/30"
-      >
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-copper-500/40 to-transparent"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-copper-500/40 to-transparent"
-        />
-        <CurvedLoop
-          marqueeText="SHARE • LEARN • EXCHANGE • CONNECT • TRUST • "
-          speed={1.5}
-          curveAmount={400}
-          direction="left"
-          interactive={true}
-        />
-      </section>
-
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-20 px-4 bg-surface/50 border-y border-border">
+      <section id="how-it-works" className="py-20 px-4 bg-surface/50 border-t border-border">
         <div className="container mx-auto max-w-5xl">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-foreground">How it works</h2>
@@ -99,6 +77,29 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Brand Curved Loop Transition */}
+      <section
+        aria-label="Skill Exchange values"
+        className="relative border-y border-border/60 bg-surface/30"
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-copper-500/40 to-transparent"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-copper-500/40 to-transparent"
+        />
+        <CurvedLoop
+          marqueeText="SHARE ✦ LEARN ✦ EXCHANGE ✦ CONNECT ✦ TRUST ✦ "
+          speed={1.5}
+          curveAmount={400}
+          direction="left"
+          interactive={true}
+          className="drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]"
+        />
+      </section>
+
       {/* Example Match Section */}
       <section className="py-24 px-4">
         <div className="container mx-auto max-w-4xl text-center">
@@ -130,6 +131,17 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* About Section */}
+      <section id="about" className="py-24 px-4 bg-surface/30 border-t border-border">
+        <div className="container mx-auto max-w-3xl text-center space-y-6">
+          <Badge variant="outline" className="mb-4">Our Mission</Badge>
+          <h2 className="text-3xl font-bold text-foreground">About Skill Exchange</h2>
+          <p className="text-lg text-foreground-secondary leading-relaxed mx-auto">
+            We believe that everyone has something valuable to teach and something new they want to learn. Skill Exchange was built to break down financial barriers to education by creating a community where knowledge is the only currency.
+          </p>
+        </div>
+      </section>
+
       {/* Trust & CTA */}
       <section className="py-24 px-4 bg-surface-card border-t border-border">
         <div className="container mx-auto max-w-3xl text-center space-y-8">
@@ -141,7 +153,7 @@ export default function LandingPage() {
             <Rating value={4.9} count={124} className="scale-125" />
           </div>
           <div className="pt-8">
-            <Button as={Link} href="/dashboard" size="large" variant="primary">
+            <Button as={Link} href="/register" size="large" variant="primary">
               Join Skill Exchange
             </Button>
           </div>

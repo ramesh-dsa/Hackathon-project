@@ -31,13 +31,14 @@ const CurvedLoop = ({
   const dirRef = useRef(direction);
   const velRef = useRef(0);
 
-  const textLength = spacing;
+  const textLength = spacing || 100;
+  const copies = Math.min(20, Math.ceil(4000 / textLength) + 4);
   const totalText = textLength
-    ? Array(Math.ceil(1800 / textLength) + 2)
+    ? Array(copies)
         .fill(text)
         .join('')
     : text;
-  const ready = spacing > 0;
+  const ready = true;
 
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -64,7 +65,15 @@ const CurvedLoop = ({
   }, []);
 
   useEffect(() => {
-    if (measureRef.current) setSpacing(measureRef.current.getComputedTextLength());
+    const updateSpacing = () => {
+      if (measureRef.current) {
+        const length = measureRef.current.getComputedTextLength();
+        if (length > 0) setSpacing(length);
+      }
+    };
+    updateSpacing();
+    const timeout = setTimeout(updateSpacing, 500); // Check again after font loads
+    return () => clearTimeout(timeout);
   }, [text, className]);
 
   useEffect(() => {
@@ -134,12 +143,11 @@ const CurvedLoop = ({
   return (
     <div
       className={cn(
-        'relative w-full overflow-hidden',
-        'py-8 md:py-12',
+        'relative w-full overflow-hidden flex items-center justify-center',
+        'pt-12 pb-40 md:pt-24 md:pb-64',
         className
       )}
       style={{
-        visibility: ready ? 'visible' : 'hidden',
         cursor: cursorStyle,
       }}
       onPointerDown={onPointerDown}
@@ -148,13 +156,12 @@ const CurvedLoop = ({
       onPointerLeave={endDrag}
       aria-hidden={!showAnimation}
     >
-      {/* Semantic fallback for screen readers / no motion / mobile */}
       <p className="sr-only">
-        {marqueeText.split('•').map((s) => s.trim()).filter(Boolean).join(', ')}
+        {marqueeText.split(/[•✦✨]/).map((s) => s.trim()).filter(Boolean).join(', ')}
       </p>
 
       <svg
-        className="select-none w-full overflow-hidden block text-[3rem] sm:text-[4.5rem] md:text-[6rem] font-bold uppercase leading-none text-foreground-muted"
+        className="select-none w-full overflow-visible block aspect-[100/12] text-[3rem] sm:text-[4.5rem] md:text-[6rem] font-bold uppercase leading-none"
         viewBox="0 0 1440 120"
         preserveAspectRatio="xMidYMid meet"
         role="presentation"
@@ -173,7 +180,7 @@ const CurvedLoop = ({
         <text
           ref={measureRef}
           xmlSpace="preserve"
-          style={{ visibility: 'hidden', opacity: 0, pointerEvents: 'none' }}
+          style={{ opacity: 0, pointerEvents: 'none' }}
         >
           {text}
         </text>
@@ -181,12 +188,12 @@ const CurvedLoop = ({
         {ready && (
           <text
             xmlSpace="preserve"
-            className="fill-[var(--color-foreground-muted)]"
+            className={cn("fill-white", className)}
           >
             <textPath
               ref={textPathRef}
               href={`#${pathId}`}
-              startOffset={offset + 'px'}
+              startOffset={(offset || 0) + 'px'}
               xmlSpace="preserve"
             >
               {totalText}

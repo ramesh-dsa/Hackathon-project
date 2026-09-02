@@ -9,7 +9,7 @@ export function AppShell({ children }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen w-full bg-background">
       {/* Desktop Sidebar (hidden on mobile/tablet) */}
       <aside className="hidden lg:flex w-64 flex-col border-r border-border bg-surface-card fixed inset-y-0 z-40">
         <SidebarContent />
@@ -55,8 +55,8 @@ export function AppShell({ children }) {
           </div>
         </Drawer>
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
-          <div className="mx-auto max-w-5xl">
+        <main className="flex-1 px-4 sm:px-6 lg:px-8 pt-8 pb-12 lg:pt-12">
+          <div className="mx-auto max-w-7xl">
             {children}
           </div>
         </main>

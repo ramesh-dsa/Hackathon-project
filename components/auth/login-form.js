@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -10,6 +11,7 @@ export function LoginForm() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const validate = () => {
     const newErrors = {};
@@ -34,7 +36,7 @@ export function LoginForm() {
       // Simulate API call delay for UI feedback
       setTimeout(() => {
         setIsLoading(false);
-        // We do not simulate fake authentication as requested
+        router.push('/dashboard');
       }, 1000);
     }
   };

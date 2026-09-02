@@ -1,5 +1,6 @@
 import { Navbar } from "../../components/layout/navbar";
 import { Footer } from "../../components/layout/footer";
+import { BackToTop } from "../../components/ui/back-to-top";
 
 export default function PublicLayout({ children }) {
   return (
@@ -9,6 +10,7 @@ export default function PublicLayout({ children }) {
         {children}
       </main>
       <Footer />
+      <BackToTop />
     </div>
   );
 }

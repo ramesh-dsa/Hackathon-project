@@ -18,9 +18,7 @@ export function Navbar() {
               </span>
             </Link>
             <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-              <Link href="/discover" className="text-foreground-secondary hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-sm">
-                Discover
-              </Link>
+
               <Link href="/#how-it-works" className="text-foreground-secondary hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-sm">
                 How It Works
               </Link>
@@ -67,9 +65,7 @@ export function Navbar() {
           </Button>
         </div>
         <nav className="flex flex-col p-4 space-y-4">
-          <Link href="/discover" onClick={() => setIsMobileMenuOpen(false)} className="px-2 py-3 text-base font-medium text-foreground-secondary hover:text-foreground transition-colors border-b border-border/50">
-            Discover
-          </Link>
+
           <Link href="/#how-it-works" onClick={() => setIsMobileMenuOpen(false)} className="px-2 py-3 text-base font-medium text-foreground-secondary hover:text-foreground transition-colors border-b border-border/50">
             How It Works
           </Link>

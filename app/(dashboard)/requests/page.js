@@ -1,10 +1,34 @@
-import { requests } from "../../../lib/mock-data";
+"use client";
+
+import { useState, useEffect } from "react";
+import { useUser } from "../../../lib/user-context";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/badge";
 import { Avatar } from "../../../components/ui/avatar";
 
 export default function RequestsPage() {
+  const { requests, acceptRequest, declineRequest, cancelRequest } = useUser();
+  const [highlightId, setHighlightId] = useState(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('highlight');
+      if (id) {
+        setHighlightId(id);
+        
+        // Auto-dismiss highlight and clean URL after a few seconds
+        const timer = setTimeout(() => {
+          setHighlightId(null);
+          window.history.replaceState(null, '', window.location.pathname);
+        }, 3500);
+        
+        return () => clearTimeout(timer);
+      }
+    }
+  }, []);
+
   return (
     <div className="flex flex-col gap-8 pb-10">
       <div className="mb-4">
@@ -45,8 +69,8 @@ export default function RequestsPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-end gap-3 pt-4 border-t border-border mt-4">
-                  <Button variant="outline">Decline</Button>
-                  <Button variant="primary">Accept Exchange</Button>
+                  <Button variant="outline" onClick={() => declineRequest(req.id)}>Decline</Button>
+                  <Button variant="primary" onClick={() => acceptRequest(req.id)}>Accept Exchange</Button>
                 </CardFooter>
               </Card>
             ))
@@ -58,9 +82,14 @@ export default function RequestsPage() {
           {requests.sent.length === 0 ? (
             <p className="text-foreground-muted">You haven't sent any requests.</p>
           ) : (
-            requests.sent.map(req => (
-              <Card key={req.id}>
-                <CardHeader>
+            requests.sent.map(req => {
+              const isHighlighted = req.id === highlightId;
+              return (
+                <Card 
+                  key={req.id}
+                  className={`transition-all duration-1000 ${isHighlighted ? "ring-2 ring-primary bg-primary/5 shadow-lg shadow-primary/20 scale-[1.02]" : ""}`}
+                >
+                  <CardHeader>
                   <div className="flex justify-between items-start">
                     <div className="flex gap-4 items-center">
                       <Avatar src={req.user.avatar} alt={req.user.name} size="md" />
@@ -85,10 +114,11 @@ export default function RequestsPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-end gap-3 pt-4 border-t border-border mt-4">
-                  <Button variant="ghost" className="text-error">Cancel Request</Button>
+                  <Button variant="ghost" className="text-error" onClick={() => cancelRequest(req.id)}>Cancel Request</Button>
                 </CardFooter>
               </Card>
-            ))
+            );
+          })
           )}
         </div>
       </div>
