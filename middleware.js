@@ -37,7 +37,7 @@ export async function middleware(request) {
   const { pathname } = request.nextUrl
 
   // Protected routes: require authentication
-  const protectedPaths = ['/dashboard', '/discover', '/my-skills', '/requests', '/exchanges', '/profile']
+  const protectedPaths = ['/dashboard', '/discover', '/my-skills', '/requests', '/exchanges', '/profile', '/complete-profile']
   const isProtected = protectedPaths.some(p => pathname.startsWith(p))
 
   if (isProtected && !user) {
@@ -46,8 +46,8 @@ export async function middleware(request) {
     return NextResponse.redirect(url)
   }
 
-  // Auth pages: redirect logged-in users to dashboard (except reset-password and verification pages,
-  // which are needed after entering recovery / email verification OTPs)
+  // Auth pages: redirect logged-in users to dashboard (except verification/recovery/complete-profile
+  // which are needed after OTP verification or first-time profile setup)
   const authPaths = ['/login', '/register', '/forgot-password', '/verify-email', '/verify-recovery']
   const isAuthPage = authPaths.some(p => pathname === p)
 

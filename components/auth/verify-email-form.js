@@ -90,9 +90,9 @@ export function VerifyEmailForm() {
       return;
     }
 
-    setSuccess('Email verified successfully! Redirecting...');
+    setSuccess('Email verified! Setting up your profile...');
     setTimeout(() => {
-      router.push('/dashboard');
+      router.push('/complete-profile');
       router.refresh();
     }, 1000);
   };

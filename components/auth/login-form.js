@@ -75,8 +75,23 @@ export function LoginForm() {
       return;
     }
 
-    // Login succeeded — navigate to dashboard.
-    router.push('/dashboard');
+    // Login succeeded — check if profile is complete
+    const { data: { user: loggedInUser } } = await supabase.auth.getUser();
+    if (loggedInUser) {
+      const { data: profile } = await supabase
+        .from('users')
+        .select('profile_complete')
+        .eq('id', loggedInUser.id)
+        .maybeSingle();
+
+      if (profile?.profile_complete) {
+        router.push('/dashboard');
+      } else {
+        router.push('/complete-profile');
+      }
+    } else {
+      router.push('/dashboard');
+    }
     router.refresh();
   };
 
