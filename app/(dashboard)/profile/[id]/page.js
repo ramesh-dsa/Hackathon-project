@@ -20,8 +20,8 @@ export default function ProfilePage({ params }) {
   const { allUsers, sendRequest, currentUser, requests, updateProfile } = useUser();
   const user = allUsers.find(u => u.id === id) || allUsers[0];
 
-  const isCurrentUser = user.id === currentUser.id;
-  const hasSentRequest = requests.sent.some(r => r.user.id === user.id);
+  const isCurrentUser = currentUser && user.id === currentUser.id;
+  const hasSentRequest = requests.sent.some(r => r.user?.id === user.id);
 
   const [activeTab, setActiveTab] = useState("overview");
   

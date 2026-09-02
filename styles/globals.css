@@ -100,6 +100,7 @@
 
 /* Base layer resets for dark-first design */
 html {
+  font-size: 110%;
   scroll-behavior: smooth;
   scroll-padding-top: 5rem; /* Account for sticky header (h-16 + some padding) */
 }

@@ -12,13 +12,23 @@ export function DashboardSearch({ users }) {
     let matches = users;
     
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      matches = matches.filter(
-        (u) =>
-          u.offers.some((skill) => skill.toLowerCase().includes(query)) ||
-          u.needs.some((skill) => skill.toLowerCase().includes(query)) ||
-          u.name.toLowerCase().includes(query)
-      );
+      // Split search query into individual words (tokens)
+      const searchTerms = searchQuery.toLowerCase().split(/\s+/).filter(Boolean);
+      
+      matches = matches.filter((u) => {
+        // Combine all searchable text for this user into one big string
+        const searchableText = [
+          u.name,
+          u.bio,
+          u.location,
+          ...(u.offers || []),
+          ...(u.needs || []),
+          ...(u.languages || []),
+        ].join(" ").toLowerCase();
+
+        // Check if EVERY search term is found in the searchable text
+        return searchTerms.every(term => searchableText.includes(term));
+      });
       return matches;
     }
     

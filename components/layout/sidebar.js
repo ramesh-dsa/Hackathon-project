@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Avatar } from '../ui/avatar';
 import { cn } from '../../lib/utils';
+import { useUser } from '../../lib/user-context';
 
 const workspaceLinks = [
   { href: '/dashboard', label: 'Dashboard' },
@@ -12,12 +13,15 @@ const workspaceLinks = [
   { href: '/exchanges', label: 'Exchanges' },
 ];
 
-const communityLinks = [
-  { href: '/profile/u1', label: 'Profile' },
-];
-
 export function SidebarContent({ onLinkClick }) {
   const pathname = usePathname();
+  const { currentUser, logout } = useUser();
+
+  const profileLink = currentUser ? `/profile/${currentUser.id}` : '/dashboard';
+
+  const communityLinks = [
+    { href: profileLink, label: 'Profile' },
+  ];
 
   const renderLink = (link) => {
     const isActive = pathname === link.href || pathname.startsWith(link.href + '/');
@@ -69,19 +73,22 @@ export function SidebarContent({ onLinkClick }) {
 
       <div className="mt-auto border-t border-border pt-4">
         <div className="mb-4 flex items-center px-3 gap-3">
-          <Avatar src="https://i.pravatar.cc/150?u=ramesh" alt="Ramesh" size="sm" />
+          <Avatar src={currentUser?.avatar} alt={currentUser?.name || 'User'} size="sm" />
           <div className="flex flex-col">
-            <span className="text-sm font-medium text-foreground">Ramesh</span>
-            <span className="text-xs text-foreground-muted">Pro Member</span>
+            <span className="text-sm font-medium text-foreground">{currentUser?.name || 'User'}</span>
+            <span className="text-xs text-foreground-muted">Member</span>
           </div>
         </div>
         <div className="space-y-1">
           <Link href="#" className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-foreground-secondary hover:bg-surface-hover hover:text-foreground transition-colors">
             Settings
           </Link>
-          <Link href="/" className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-foreground-secondary hover:bg-surface-hover hover:text-foreground transition-colors">
+          <button 
+            onClick={logout}
+            className="w-full text-left flex items-center rounded-md px-3 py-2 text-sm font-medium text-foreground-secondary hover:bg-surface-hover hover:text-foreground transition-colors"
+          >
             Sign Out
-          </Link>
+          </button>
         </div>
       </div>
     </div>
