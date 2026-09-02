@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '../ui/button';
@@ -12,11 +12,27 @@ export function LoginForm() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [alreadyLoggedIn, setAlreadyLoggedIn] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   // Track whether the error is specifically "email not confirmed"
   const [emailNotConfirmed, setEmailNotConfirmed] = useState(false);
   const [resendStatus, setResendStatus] = useState('idle'); // 'idle' | 'sending' | 'sent' | 'error'
   const router = useRouter();
   const supabase = createClient();
+
+  // Check if already logged in on mount
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) setAlreadyLoggedIn(true);
+    });
+  }, []);
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    await supabase.auth.signOut();
+    setAlreadyLoggedIn(false);
+    setIsSigningOut(false);
+  };
 
   const validate = () => {
     const newErrors = {};
@@ -124,6 +140,34 @@ export function LoginForm() {
 
   return (
     <div className="w-full">
+
+      {/* Already logged in banner */}
+      {alreadyLoggedIn && (
+        <div className="mb-6 rounded-lg bg-primary/10 border border-primary/20 p-4 space-y-3">
+          <p className="text-sm font-semibold text-primary">You are already signed in.</p>
+          <p className="text-xs text-foreground-secondary">Go back to your dashboard or sign in as a different account.</p>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="primary"
+              className="flex-1 text-xs"
+              onClick={() => router.push('/dashboard')}
+            >
+              Go to Dashboard
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1 text-xs"
+              onClick={handleSignOut}
+              disabled={isSigningOut}
+            >
+              {isSigningOut ? 'Signing out...' : 'Sign in as different account'}
+            </Button>
+          </div>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-6" noValidate>
 
         {/* Generic error banner */}

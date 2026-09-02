@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 
-export async function middleware(request) {
+export async function proxy(request) {
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -37,7 +37,16 @@ export async function middleware(request) {
   const { pathname } = request.nextUrl
 
   // Protected routes: require authentication
-  const protectedPaths = ['/dashboard', '/discover', '/my-skills', '/requests', '/exchanges', '/profile', '/complete-profile']
+  // If not logged in, send to /login
+  const protectedPaths = [
+    '/dashboard',
+    '/discover',
+    '/my-skills',
+    '/requests',
+    '/exchanges',
+    '/profile',
+    '/complete-profile',
+  ]
   const isProtected = protectedPaths.some(p => pathname.startsWith(p))
 
   if (isProtected && !user) {
@@ -46,16 +55,9 @@ export async function middleware(request) {
     return NextResponse.redirect(url)
   }
 
-  // Auth pages: redirect logged-in users to dashboard (except verification/recovery/complete-profile
-  // which are needed after OTP verification or first-time profile setup)
-  const authPaths = ['/login', '/register', '/forgot-password', '/verify-email', '/verify-recovery']
-  const isAuthPage = authPaths.some(p => pathname === p)
-
-  if (isAuthPage && user) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
-    return NextResponse.redirect(url)
-  }
+  // NOTE: We deliberately do NOT auto-redirect logged-in users away from
+  // /login or /register. The user may want to log in as a different account.
+  // The LoginForm itself handles post-login routing to /dashboard.
 
   return supabaseResponse
 }
