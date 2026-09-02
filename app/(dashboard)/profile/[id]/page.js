@@ -20,15 +20,15 @@ export default function ProfilePage({ params }) {
   const { allUsers, sendRequest, currentUser, requests, updateProfile } = useUser();
   const user = allUsers.find(u => u.id === id) || allUsers[0];
 
-  const isCurrentUser = currentUser && user.id === currentUser.id;
-  const hasSentRequest = requests.sent.some(r => r.user?.id === user.id);
+  const isCurrentUser = !!(currentUser && user && user.id === currentUser.id);
+  const hasSentRequest = (requests?.sent || []).some(r => r.user?.id === user?.id);
 
   const [activeTab, setActiveTab] = useState("overview");
   
   // Request Modal State
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
-  const [offering, setOffering] = useState(currentUser.offers[0] || "");
-  const [wanting, setWanting] = useState(user.offers[0] || "");
+  const [offering, setOffering] = useState((currentUser?.offers || [])[0] || "");
+  const [wanting, setWanting] = useState((user?.offers || [])[0] || "");
 
   // Edit Profile Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -81,6 +81,15 @@ export default function ProfilePage({ params }) {
     });
     setIsEditModalOpen(false);
   };
+
+  // Guard: if user not found yet (still loading), show spinner
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pb-12 bg-background">

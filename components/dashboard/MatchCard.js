@@ -63,22 +63,38 @@ export function MatchCard({ match }) {
                   </div>
                 </div>
                 
-                <div className="mt-4 pt-4 border-t border-border flex justify-end">
+                <div className="mt-4 pt-4 border-t border-border flex justify-end gap-2">
                   <Button 
-                    onClick={() => {
-                      if (showAsRequested) {
-                        const reqId = sentRequest?.id || requests?.sent?.[0]?.id;
-                        router.push(`/requests${reqId ? `?highlight=${reqId}` : ''}`);
-                      } else {
-                        setIsModalOpen(true);
-                      }
-                    }}
-                    variant={showAsRequested ? "secondary" : "primary"} 
+                    as={Link}
+                    href={`/profile/${match.id}`}
+                    variant="outline" 
                     size="small"
-                    className="group-hover:-translate-y-0.5 transition-transform duration-200 focus:outline-none"
+                    className="transition-transform duration-200"
                   >
-                    {showAsRequested ? "View Request" : "View Profile"}
+                    View Profile
                   </Button>
+                  {!showAsRequested && (
+                    <Button 
+                      onClick={() => setIsModalOpen(true)}
+                      variant="primary" 
+                      size="small"
+                      className="group-hover:-translate-y-0.5 transition-transform duration-200 focus:outline-none"
+                    >
+                      Request Exchange
+                    </Button>
+                  )}
+                  {showAsRequested && (
+                    <Button 
+                      onClick={() => {
+                        const reqId = sentRequest?.id;
+                        router.push(`/requests${reqId ? `?highlight=${reqId}` : ''}`);
+                      }}
+                      variant="secondary" 
+                      size="small"
+                    >
+                      View Request
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>

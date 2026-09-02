@@ -9,6 +9,8 @@ import { useUser } from "../../lib/user-context";
 export function DashboardSummary({ activeExchanges = [], incomingRequests = [] }) {
   const { currentUser } = useUser();
   const offerings = currentUser?.offers || [];
+  // Only show pending requests in the dashboard badge
+  const pendingIncoming = incomingRequests.filter(r => r.status === 'pending');
   return (
     <section className="grid gap-6 md:grid-cols-3 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <Card className="bg-surface-elevated flex flex-col justify-between hover:border-border-strong transition-colors duration-200 group">
@@ -50,10 +52,10 @@ export function DashboardSummary({ activeExchanges = [], incomingRequests = [] }
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {incomingRequests.length > 0 ? (
+          {pendingIncoming.length > 0 ? (
             <div>
-              <p className="text-lg font-medium text-foreground">{incomingRequests.length} incoming</p>
-              <p className="text-sm text-foreground-secondary mt-1">{incomingRequests[0].user.name} wants to learn {incomingRequests[0].wanting}</p>
+              <p className="text-lg font-medium text-foreground">{pendingIncoming.length} incoming</p>
+              <p className="text-sm text-foreground-secondary mt-1">{pendingIncoming[0].user.name} wants to learn {pendingIncoming[0].wanting}</p>
             </div>
           ) : (
             <p className="text-sm text-foreground-secondary">You're all caught up.</p>
