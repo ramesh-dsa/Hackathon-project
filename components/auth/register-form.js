@@ -107,9 +107,8 @@ export function RegisterForm() {
       router.push('/dashboard');
       router.refresh();
     } else {
-      // Email confirmation is required — show "check your email" screen.
-      setRegisteredEmail(formData.email);
-      setSignUpState('confirm-email');
+      // Email confirmation is required — redirect to /verify-email screen with 6-digit OTP entry.
+      router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
     }
   };
 

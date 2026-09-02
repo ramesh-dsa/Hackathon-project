@@ -120,12 +120,12 @@ export function LoginForm() {
 
         {/* Email not confirmed banner */}
         {emailNotConfirmed && (
-          <div className="rounded-md bg-warning/10 border border-warning/20 px-4 py-3 space-y-2" role="alert">
+          <div className="rounded-md bg-warning/10 border border-warning/20 px-4 py-3 space-y-3" role="alert">
             <p className="text-sm font-medium text-warning">
               Please confirm your email before signing in.
             </p>
             <p className="text-xs text-foreground-secondary">
-              Check your inbox for a confirmation link. If you didn&apos;t receive it, you can resend it below.
+              Enter the 6-digit verification code sent to your inbox.
             </p>
             {resendStatus === 'sent' && (
               <p className="text-xs text-success font-medium" role="status">
@@ -137,15 +137,23 @@ export function LoginForm() {
                 Failed to resend. Please wait a moment and try again.
               </p>
             )}
-            <Button
-              type="button"
-              variant="secondary"
-              className="w-full !py-1.5 !text-xs"
-              onClick={handleResend}
-              disabled={resendStatus === 'sending' || resendStatus === 'sent'}
-            >
-              {resendStatus === 'sending' ? 'Resending...' : resendStatus === 'sent' ? 'Email Sent' : 'Resend Confirmation Email'}
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Link
+                href={`/verify-email?email=${encodeURIComponent(formData.email)}`}
+                className="flex-1 text-center bg-primary hover:bg-primary-hover text-primary-foreground font-medium py-1.5 px-3 rounded-md text-xs transition-colors"
+              >
+                Enter 6-Digit Code
+              </Link>
+              <Button
+                type="button"
+                variant="secondary"
+                className="flex-1 !py-1.5 !text-xs"
+                onClick={handleResend}
+                disabled={resendStatus === 'sending' || resendStatus === 'sent'}
+              >
+                {resendStatus === 'sending' ? 'Resending...' : resendStatus === 'sent' ? 'Email Sent' : 'Resend Code'}
+              </Button>
+            </div>
           </div>
         )}
 

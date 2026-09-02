@@ -46,9 +46,9 @@ export async function middleware(request) {
     return NextResponse.redirect(url)
   }
 
-  // Auth pages: redirect logged-in users to dashboard (except reset-password,
-  // which is needed after clicking a password reset email link)
-  const authPaths = ['/login', '/register', '/forgot-password']
+  // Auth pages: redirect logged-in users to dashboard (except reset-password and verification pages,
+  // which are needed after entering recovery / email verification OTPs)
+  const authPaths = ['/login', '/register', '/forgot-password', '/verify-email', '/verify-recovery']
   const isAuthPage = authPaths.some(p => pathname === p)
 
   if (isAuthPage && user) {

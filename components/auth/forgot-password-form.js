@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -13,6 +14,7 @@ export function ForgotPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
+  const router = useRouter();
   const supabase = createClient();
 
   const validate = () => {
@@ -53,8 +55,9 @@ export function ForgotPasswordForm() {
       console.error('Password reset error:', error);
     }
 
-    // Always show the "check email" confirmation — do not reveal if email exists.
-    setSubmitted(true);
+    // Always navigate to verify-recovery screen to allow 6-digit OTP code entry.
+    // Preserves privacy — does not reveal account existence.
+    router.push(`/verify-recovery?email=${encodeURIComponent(email)}`);
   };
 
   if (submitted) {
