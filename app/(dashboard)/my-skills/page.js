@@ -53,7 +53,7 @@ export default function MySkillsPage() {
               <Button type="submit" variant="primary">Add</Button>
             </form>
             <ul className="space-y-4">
-              {currentUser.offers.length > 0 ? (
+              {(currentUser?.offers || []).length > 0 ? (
                 currentUser.offers.map(skill => (
                   <li key={skill} className="flex items-center justify-between p-3 border border-border rounded-lg bg-surface hover:border-border-strong transition-colors">
                     <span className="font-medium text-foreground">{skill}</span>
@@ -90,7 +90,7 @@ export default function MySkillsPage() {
               <Button type="submit" variant="primary">Add</Button>
             </form>
             <ul className="space-y-4">
-              {currentUser.needs.length > 0 ? (
+              {(currentUser?.needs || []).length > 0 ? (
                 currentUser.needs.map(skill => (
                   <li key={skill} className="flex items-center justify-between p-3 border border-border rounded-lg bg-surface hover:border-border-strong transition-colors">
                     <span className="font-medium text-foreground">{skill}</span>
