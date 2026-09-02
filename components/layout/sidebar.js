@@ -11,6 +11,7 @@ const workspaceLinks = [
   { href: '/my-skills', label: 'My Skills' },
   { href: '/requests', label: 'Requests' },
   { href: '/exchanges', label: 'Exchanges' },
+  { href: '/messages', label: 'Messages' },
 ];
 
 export function SidebarContent({ onLinkClick }) {

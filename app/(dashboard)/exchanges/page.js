@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 import { useUser } from "../../../lib/user-context";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../../components/ui/card";
@@ -54,7 +55,9 @@ export default function ExchangesPage() {
                 </div>
               </CardContent>
               <CardFooter className="flex justify-end gap-3 border-t border-border p-4">
-                <Button variant="outline">Message</Button>
+                <Button variant="outline" asChild>
+                  <Link href={`/messages/${exc.id}`}>Message</Link>
+                </Button>
                 {exc.status === "in-progress" && (
                   <Button variant="primary" onClick={() => completeExchange(exc.id)}>Mark Completed</Button>
                 )}
