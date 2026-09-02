@@ -251,3 +251,4 @@ GRANT ALL ON public.requests TO authenticated;
 
 -- Grant sequence usage to authenticated (for SERIAL columns)
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO authenticated;
+\n-- ===========================================\n-- ENABLE REALTIME FOR USERS\n-- ===========================================\n-- To make new users show up instantly without refreshing:\nALTER PUBLICATION supabase_realtime ADD TABLE public.users;\n
