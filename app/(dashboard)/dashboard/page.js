@@ -5,12 +5,12 @@ import { DashboardSummary } from "../../../components/dashboard/DashboardSummary
 import { DashboardSearch } from "../../../components/dashboard/DashboardSearch";
 
 export default function DashboardPage() {
-  const { exchanges, requests, allUsers, currentUser } = useUser();
+  const { exchanges = [], requests = { incoming: [], sent: [] }, allUsers = [], currentUser } = useUser() || {};
   
-  const activeExchanges = exchanges.filter((e) => e.status === "in-progress");
+  const activeExchanges = (exchanges || []).filter((e) => e?.status === "in-progress");
   
   // Exclude current user
-  const availableUsers = allUsers.filter((u) => u.id !== currentUser?.id);
+  const availableUsers = (allUsers || []).filter((u) => u?.id !== currentUser?.id);
 
   return (
     <div className="flex flex-col gap-8 pb-10">
@@ -25,7 +25,7 @@ export default function DashboardPage() {
       {/* Summary Row */}
       <DashboardSummary 
         activeExchanges={activeExchanges}
-        incomingRequests={requests.incoming}
+        incomingRequests={requests?.incoming || []}
       />
 
       {/* Search and Matches */}

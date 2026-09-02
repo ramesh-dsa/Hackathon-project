@@ -6,9 +6,9 @@ import { Button } from "../ui/button";
 import { Avatar } from "../ui/avatar";
 import { useUser } from "../../lib/user-context";
 
-export function DashboardSummary({ activeExchanges, incomingRequests }) {
+export function DashboardSummary({ activeExchanges = [], incomingRequests = [] }) {
   const { currentUser } = useUser();
-  const offerings = currentUser.offers;
+  const offerings = currentUser?.offers || [];
   return (
     <section className="grid gap-6 md:grid-cols-3 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <Card className="bg-surface-elevated flex flex-col justify-between hover:border-border-strong transition-colors duration-200 group">
