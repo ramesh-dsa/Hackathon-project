@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "../../../../lib/supabase/client";
 import { useUser } from "../../../../lib/user-context";
 import { Avatar } from "../../../../components/ui/avatar";
@@ -207,11 +208,13 @@ export default function ChatRoom() {
           <Button variant="ghost" className="p-2 md:hidden" onClick={() => router.push('/messages')}>
             &larr; Back
           </Button>
-          <Avatar src={partner?.avatar} alt={partner?.name} size="sm" />
-          <div>
-            <h2 className="font-semibold text-foreground">{partner?.name}</h2>
-            <p className="text-xs text-foreground-secondary">Direct Message</p>
-          </div>
+          <Link href={`/profile/${partner?.id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <Avatar src={partner?.avatar} alt={partner?.name} size="sm" />
+            <div>
+              <h2 className="font-semibold text-foreground hover:underline">{partner?.name}</h2>
+              <p className="text-xs text-foreground-secondary">Direct Message</p>
+            </div>
+          </Link>
         </div>
       </div>
 
