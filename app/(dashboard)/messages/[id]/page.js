@@ -58,8 +58,8 @@ export default function ChatRoom() {
         setPartner(thePartner);
       }
 
-      // 1. Establish Realtime Subscription
-      channel = supabase.channel(`messages:${conversationId}`);
+      // 1. Establish Realtime Subscription (use random string to avoid React Strict Mode reuse bugs)
+      channel = supabase.channel(`messages:${conversationId}-${Date.now()}`);
       
       channel.on('postgres_changes', { 
         event: 'INSERT', 
