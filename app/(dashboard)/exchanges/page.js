@@ -1,7 +1,10 @@
 "use client";
+
+import { useState } from "react";
 import Link from "next/link";
 
 import { useUser } from "../../../lib/user-context";
+import { Modal } from "../../../components/ui/modal";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/badge";
@@ -10,8 +13,29 @@ import { Avatar } from "../../../components/ui/avatar";
 import { useRouter } from "next/navigation";
 
 export default function ExchangesPage() {
-  const { exchanges, completeExchange, getOrCreateConversation } = useUser();
+  const { exchanges, completeExchange, completeAndReviewExchange, getOrCreateConversation } = useUser();
   const router = useRouter();
+
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedExchange, setSelectedExchange] = useState(null);
+  const [rating, setRating] = useState(5);
+  const [reviewText, setReviewText] = useState("");
+
+  const handleMarkCompletedClick = (exc) => {
+    setSelectedExchange(exc);
+    setRating(5);
+    setReviewText("");
+    setReviewModalOpen(true);
+  };
+
+  const handleReviewSubmit = (e) => {
+    e.preventDefault();
+    if (selectedExchange) {
+      completeAndReviewExchange(selectedExchange.id, selectedExchange.partner.id, rating, reviewText);
+    }
+    setReviewModalOpen(false);
+    setSelectedExchange(null);
+  };
 
   const handleMessageClick = async (partnerId) => {
     const conversationId = await getOrCreateConversation(partnerId);
@@ -71,13 +95,76 @@ export default function ExchangesPage() {
                   Message
                 </Button>
                 {exc.status === "in-progress" && (
-                  <Button variant="primary" onClick={() => completeExchange(exc.id)}>Mark Completed</Button>
+                  <Button variant="primary" onClick={() => handleMarkCompletedClick(exc)}>Mark Completed</Button>
                 )}
               </CardFooter>
             </Card>
           ))
         )}
       </div>
+
+      <Modal isOpen={reviewModalOpen} onClose={() => setReviewModalOpen(false)} title="Leave a Review">
+        {selectedExchange && (
+          <form onSubmit={handleReviewSubmit} className="space-y-6">
+            <p className="text-sm text-foreground-secondary">
+              You have completed your exchange with <span className="font-semibold text-foreground">{selectedExchange.partner.name}</span>! 
+              Please leave a rating and review to help others know about your experience.
+            </p>
+
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-foreground">Rating</label>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setRating(star)}
+                    className="focus:outline-none focus:ring-2 focus:ring-primary rounded-full p-1 transition-transform hover:scale-110"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className={`w-8 h-8 ${star <= rating ? 'text-warning' : 'text-surface-hover border-border border rounded-full bg-surface-hover'}`}
+                    >
+                      {star <= rating && (
+                        <path
+                          fillRule="evenodd"
+                          d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
+                          clipRule="evenodd"
+                        />
+                      )}
+                    </svg>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="review" className="block text-sm font-medium text-foreground">
+                Your Review
+              </label>
+              <textarea
+                id="review"
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
+                placeholder={`What did you learn from ${selectedExchange.partner.name}? Was it a good experience?`}
+                className="w-full bg-surface border border-border rounded-md p-3 text-sm text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all min-h-[120px]"
+                required
+              />
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t border-border">
+              <Button type="button" variant="outline" onClick={() => setReviewModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="primary">
+                Submit Review
+              </Button>
+            </div>
+          </form>
+        )}
+      </Modal>
     </div>
   );
 }
