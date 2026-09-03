@@ -68,8 +68,8 @@ export default function ExchangesPage() {
                       <CardDescription>Updated {exc.lastUpdated}</CardDescription>
                     </div>
                   </div>
-                  <Badge variant={exc.status === "completed" ? "success" : "brand"}>
-                    {exc.status === "completed" ? "Completed" : "In Progress"}
+                  <Badge variant={exc.status === "completed" ? "success" : (exc.myCompleted ? "warning" : "brand")}>
+                    {exc.status === "completed" ? "Completed" : (exc.myCompleted ? "Waiting for Partner" : "In Progress")}
                   </Badge>
                 </div>
               </CardHeader>
@@ -94,7 +94,7 @@ export default function ExchangesPage() {
                 <Button variant="outline" onClick={() => handleMessageClick(exc.partner.id)}>
                   Message
                 </Button>
-                {exc.status === "in-progress" && (
+                {exc.status === "in-progress" && !exc.myCompleted && (
                   <Button variant="primary" onClick={() => handleMarkCompletedClick(exc)}>Mark Completed</Button>
                 )}
               </CardFooter>
