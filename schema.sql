@@ -64,7 +64,8 @@ CREATE TABLE public.exchanges (
     user2_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
     user1_offering TEXT,
     user2_offering TEXT,
-    last_updated TEXT
+    last_updated TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 -- 7. Create Requests Table
@@ -75,7 +76,8 @@ CREATE TABLE public.requests (
     offering TEXT NOT NULL,
     wanting TEXT NOT NULL,
     status TEXT CHECK (status IN ('pending', 'accepted', 'declined', 'cancelled')),
-    date_display TEXT
+    date_display TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 
