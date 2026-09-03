@@ -7,8 +7,20 @@ import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/badge";
 import { Avatar } from "../../../components/ui/avatar";
 
+import { useRouter } from "next/navigation";
+
 export default function ExchangesPage() {
-  const { exchanges, completeExchange } = useUser();
+  const { exchanges, completeExchange, getOrCreateConversation } = useUser();
+  const router = useRouter();
+
+  const handleMessageClick = async (partnerId) => {
+    const conversationId = await getOrCreateConversation(partnerId);
+    if (conversationId) {
+      router.push(`/messages/${conversationId}`);
+    } else {
+      console.error("Failed to start conversation");
+    }
+  };
 
   return (
     <div className="flex flex-col gap-8 pb-10">
@@ -55,8 +67,8 @@ export default function ExchangesPage() {
                 </div>
               </CardContent>
               <CardFooter className="flex justify-end gap-3 border-t border-border p-4">
-                <Button variant="outline" asChild>
-                  <Link href={`/messages/${exc.id}`}>Message</Link>
+                <Button variant="outline" onClick={() => handleMessageClick(exc.partner.id)}>
+                  Message
                 </Button>
                 {exc.status === "in-progress" && (
                   <Button variant="primary" onClick={() => completeExchange(exc.id)}>Mark Completed</Button>
