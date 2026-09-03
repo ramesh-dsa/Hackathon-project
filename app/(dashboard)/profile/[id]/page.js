@@ -15,6 +15,25 @@ const AVAILABLE_LANGUAGES = [
   "Kannada", "Spanish", "French", "German", "Mandarin", "Japanese"
 ];
 
+const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+const parseAvailability = (avStr) => {
+  if (!avStr) return { days: [], time: "" };
+  try {
+    const parsed = JSON.parse(avStr);
+    if (parsed && Array.isArray(parsed.days)) {
+      return parsed;
+    }
+  } catch (e) {
+    // old format
+  }
+  return { days: [], time: avStr };
+};
+
+const formatAvailability = (avObj) => {
+  return JSON.stringify(avObj);
+};
+
 export default function ProfilePage({ params }) {
   const { id } = use(params);
   const { allUsers, sendRequest, currentUser, requests, updateProfile } = useUser();
@@ -37,7 +56,7 @@ export default function ProfilePage({ params }) {
     location: user.location || "",
     bio: user.bio || "",
     languages: user.languages || [],
-    availability: user.availability || ""
+    availability: parseAvailability(user.availability)
   });
 
   // Image Edit State
@@ -77,7 +96,7 @@ export default function ProfilePage({ params }) {
       location: editForm.location,
       bio: editForm.bio,
       languages: editForm.languages,
-      availability: editForm.availability
+      availability: formatAvailability(editForm.availability)
     });
     setIsEditModalOpen(false);
   };
@@ -157,10 +176,19 @@ export default function ProfilePage({ params }) {
               {/* Action Buttons */}
               <div className="w-full mt-6 space-y-3 border-b border-border pb-6">
                 {isCurrentUser ? (
-                  <Button 
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium" 
-                    onClick={() => setIsEditModalOpen(true)}
-                  >
+                  <Button
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+                      onClick={() => {
+                        setEditForm({
+                          name: user.name || "",
+                          location: user.location || "",
+                          bio: user.bio || "",
+                          languages: user.languages || [],
+                          availability: parseAvailability(user.availability)
+                        });
+                        setIsEditModalOpen(true);
+                      }}
+                    >
                     Edit profile
                   </Button>
                 ) : (
@@ -205,8 +233,25 @@ export default function ProfilePage({ params }) {
                 <div className="flex items-start gap-3">
                   <Clock className="w-4 h-4 flex-shrink-0 mt-0.5" />
                   <div>
-                    <span className="block mb-1">Availability</span>
-                    <span className="text-foreground font-medium">{user.availability || "Flexible"}</span>
+                    <span className="block mb-1 text-sm font-medium text-foreground-muted">Availability</span>
+                    <div className="text-foreground">
+                      {(() => {
+                        const av = parseAvailability(user.availability);
+                        if (av.days.length === 0 && !av.time) return <span className="font-medium">Flexible</span>;
+                        return (
+                          <div className="flex flex-col gap-1 mt-1">
+                            {av.days.length > 0 && (
+                              <div className="flex flex-wrap gap-1.5">
+                                {av.days.map(d => (
+                                  <span key={d} className="text-xs font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full">{d}</span>
+                                ))}
+                              </div>
+                            )}
+                            {av.time && <span className="text-sm font-medium">{av.time}</span>}
+                          </div>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -440,14 +485,42 @@ export default function ProfilePage({ params }) {
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-foreground">Availability</label>
-            <input 
-              type="text" 
-              value={editForm.availability} 
-              onChange={(e) => setEditForm(prev => ({ ...prev, availability: e.target.value }))}
-              className="w-full bg-surface border border-border rounded-md p-2 text-sm text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-              placeholder="Weekends & Evenings"
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-foreground">Availability Days</label>
+            <div className="flex flex-wrap gap-2">
+              {DAYS_OF_WEEK.map(day => (
+                <button
+                  key={day}
+                  type="button"
+                  onClick={() => {
+                    setEditForm(prev => {
+                      const days = prev.availability.days || [];
+                      const newDays = days.includes(day) 
+                        ? days.filter(d => d !== day)
+                        : [...days, day];
+                      return { ...prev, availability: { ...prev.availability, days: newDays } };
+                    });
+                  }}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all ${
+                    (editForm.availability.days || []).includes(day)
+                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                      : "bg-surface text-foreground-secondary border-border hover:border-primary/50"
+                  }`}
+                >
+                  {day}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-1.5 mt-4">
+            <label className="block text-sm font-medium text-foreground">Availability Time</label>
+            <input
+              type="text"
+              value={editForm.availability.time || ""}
+              onChange={(e) => setEditForm(prev => ({ ...prev, availability: { ...prev.availability, time: e.target.value } }))}
+              className="w-full bg-surface border border-border rounded-md p-2.5 text-sm text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+              placeholder="e.g. Evenings, 10am-2pm, Flexible"
             />
           </div>
 
