@@ -180,10 +180,6 @@ export default function ProfilePage({ params }) {
                       <MessageSquare className="w-4 h-4 mr-2" /> Message
                     </Button>
                   )}
-                  <Button variant="outline" className={isCurrentUser ? "w-full font-medium bg-surface text-foreground hover:bg-surface-hover border-border" : "px-3 bg-surface text-foreground hover:bg-surface-hover border-border"} aria-label="Share profile">
-                    <Share2 className="w-4 h-4" />
-                    {isCurrentUser && <span className="ml-2">Share profile</span>}
-                  </Button>
                 </div>
               </div>
 

@@ -81,9 +81,6 @@ export function SidebarContent({ onLinkClick }) {
           </div>
         </div>
         <div className="space-y-1">
-          <Link href="#" className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-foreground-secondary hover:bg-surface-hover hover:text-foreground transition-colors">
-            Settings
-          </Link>
           <button 
             onClick={logout}
             className="w-full text-left flex items-center rounded-md px-3 py-2 text-sm font-medium text-foreground-secondary hover:bg-surface-hover hover:text-foreground transition-colors"
