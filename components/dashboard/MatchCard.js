@@ -16,7 +16,7 @@ export function MatchCard({ match }) {
   const { currentUser, sendRequest, requests, getOrCreateConversation } = useUser();
 
   // Check if we already requested this user
-  const sentRequest = requests?.sent?.find(r => r.user.id === match.id);
+  const sentRequest = requests?.sent?.find(r => r.user.id === match.id && r.status === 'pending');
   const hasRequestedGlobally = !!sentRequest;
   const showAsRequested = isRequested || hasRequestedGlobally;
 

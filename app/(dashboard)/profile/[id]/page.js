@@ -21,7 +21,7 @@ export default function ProfilePage({ params }) {
   const user = allUsers.find(u => u.id === id) || allUsers[0];
 
   const isCurrentUser = !!(currentUser && user && user.id === currentUser.id);
-  const hasSentRequest = (requests?.sent || []).some(r => r.user?.id === user?.id);
+  const hasSentRequest = (requests?.sent || []).some(r => r.user?.id === user?.id && r.status === 'pending');
 
   const [activeTab, setActiveTab] = useState("overview");
   
