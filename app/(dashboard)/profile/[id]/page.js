@@ -18,16 +18,23 @@ const AVAILABLE_LANGUAGES = [
 const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 const parseAvailability = (avStr) => {
-  if (!avStr) return { days: [], time: "" };
+  if (!avStr) return {};
   try {
     const parsed = JSON.parse(avStr);
-    if (parsed && Array.isArray(parsed.days)) {
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      if (Array.isArray(parsed.days)) {
+        const newFormat = {};
+        parsed.days.forEach(d => {
+          newFormat[d] = parsed.time || "";
+        });
+        return newFormat;
+      }
       return parsed;
     }
   } catch (e) {
-    // old format
+    // old string format
   }
-  return { days: [], time: avStr };
+  return {};
 };
 
 const formatAvailability = (avObj) => {
@@ -237,17 +244,16 @@ export default function ProfilePage({ params }) {
                     <div className="text-foreground">
                       {(() => {
                         const av = parseAvailability(user.availability);
-                        if (av.days.length === 0 && !av.time) return <span className="font-medium">Flexible</span>;
+                        const days = Object.keys(av);
+                        if (days.length === 0) return <span className="font-medium">Flexible</span>;
                         return (
-                          <div className="flex flex-col gap-1 mt-1">
-                            {av.days.length > 0 && (
-                              <div className="flex flex-wrap gap-1.5">
-                                {av.days.map(d => (
-                                  <span key={d} className="text-xs font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full">{d}</span>
-                                ))}
+                          <div className="flex flex-col gap-2 mt-2">
+                            {DAYS_OF_WEEK.filter(d => av.hasOwnProperty(d)).map(d => (
+                              <div key={d} className="flex items-center gap-2">
+                                <span className="text-xs font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full w-12 text-center">{d}</span>
+                                <span className="text-sm font-medium">{av[d] || "Any time"}</span>
                               </div>
-                            )}
-                            {av.time && <span className="text-sm font-medium">{av.time}</span>}
+                            ))}
                           </div>
                         );
                       })()}
@@ -488,41 +494,58 @@ export default function ProfilePage({ params }) {
           <div className="space-y-3">
             <label className="block text-sm font-medium text-foreground">Availability Days</label>
             <div className="flex flex-wrap gap-2">
-              {DAYS_OF_WEEK.map(day => (
-                <button
-                  key={day}
-                  type="button"
-                  onClick={() => {
-                    setEditForm(prev => {
-                      const days = prev.availability.days || [];
-                      const newDays = days.includes(day) 
-                        ? days.filter(d => d !== day)
-                        : [...days, day];
-                      return { ...prev, availability: { ...prev.availability, days: newDays } };
-                    });
-                  }}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all ${
-                    (editForm.availability.days || []).includes(day)
-                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                      : "bg-surface text-foreground-secondary border-border hover:border-primary/50"
-                  }`}
-                >
-                  {day}
-                </button>
-              ))}
+              {DAYS_OF_WEEK.map(day => {
+                const isSelected = editForm.availability.hasOwnProperty(day);
+                return (
+                  <button
+                    key={day}
+                    type="button"
+                    onClick={() => {
+                      setEditForm(prev => {
+                        const newAv = { ...prev.availability };
+                        if (isSelected) {
+                          delete newAv[day];
+                        } else {
+                          newAv[day] = "";
+                        }
+                        return { ...prev, availability: newAv };
+                      });
+                    }}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all ${
+                      isSelected
+                        ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                        : "bg-surface text-foreground-secondary border-border hover:border-primary/50"
+                    }`}
+                  >
+                    {day}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div className="space-y-1.5 mt-4">
-            <label className="block text-sm font-medium text-foreground">Availability Time</label>
-            <input
-              type="text"
-              value={editForm.availability.time || ""}
-              onChange={(e) => setEditForm(prev => ({ ...prev, availability: { ...prev.availability, time: e.target.value } }))}
-              className="w-full bg-surface border border-border rounded-md p-2.5 text-sm text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-              placeholder="e.g. Evenings, 10am-2pm, Flexible"
-            />
-          </div>
+          {Object.keys(editForm.availability).length > 0 && (
+            <div className="space-y-3 mt-4">
+              <label className="block text-sm font-medium text-foreground">Specific Times (Optional)</label>
+              <div className="space-y-2">
+                {DAYS_OF_WEEK.filter(day => editForm.availability.hasOwnProperty(day)).map(day => (
+                  <div key={day} className="flex items-center gap-3">
+                    <span className="w-12 text-xs font-semibold bg-primary/10 text-primary px-2 py-1 rounded-full text-center">{day}</span>
+                    <input
+                      type="text"
+                      value={editForm.availability[day]}
+                      onChange={(e) => setEditForm(prev => ({
+                        ...prev,
+                        availability: { ...prev.availability, [day]: e.target.value }
+                      }))}
+                      className="flex-1 bg-surface border border-border rounded-md p-2 text-sm text-foreground focus:ring-2 focus:ring-primary outline-none transition-all"
+                      placeholder="e.g. 10am - 12pm"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="pt-4 flex gap-3 justify-end border-t border-border mt-6">
             <Button type="button" variant="outline" className="text-sm" onClick={() => setIsEditModalOpen(false)}>
