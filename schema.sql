@@ -25,6 +25,7 @@ CREATE TABLE public.users (
     cover_image TEXT,
     availability TEXT,
     joined_date TEXT,
+    profile_complete BOOLEAN DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
