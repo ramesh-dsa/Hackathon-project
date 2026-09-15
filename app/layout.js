@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "../styles/globals.css";
 import { UserProvider } from "../lib/user-context";
+import ClarityInit from "@/components/Clarity"; // 🔥 ADD THIS
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,7 +26,13 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <UserProvider>{children}</UserProvider>
+        
+        <ClarityInit /> {/* 🔥 THIS IS THE MAIN FIX */}
+
+        <UserProvider>
+          {children}
+        </UserProvider>
+
       </body>
     </html>
   );
